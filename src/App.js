@@ -52,45 +52,48 @@ export default function App() {
 	});
 
 	function createTask() {
-
-		let ids = 1
-		if (tasks.length == 0) {
-			ids = 1
-		} else {
-			console.log("length", tasks.length)
-			console.log("data", tasks);
-			const current_num = tasks[tasks.length - 1].id
-			ids = current_num + 1
+		const body = {
+			title: taskTitle.current.value,
+			summary: taskSummary.current.value
 		}
-		setTasks([
-			...tasks,
-			{
-				id: `id-${ids}`,
-				title: taskTitle.current.value,
-				summary: taskSummary.current.value,
-				done: false
+		const options = {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json'
 			},
-		]);
+			body: JSON.stringify(body)
+		}
+		fetch('http://localhost:8000/api/task', options)
+			.then(response => response.json())
+			.then(data => {
+				console.log(data)
+				loadTasks()
+			})
+			.catch(error => console.error(error));
 
-		saveTasks([
-			...tasks,
-			{
-				id: `id-${ids}`,
-				title: taskTitle.current.value,
-				summary: taskSummary.current.value,
-				done: false
-			},
-		]);
 	}
 
 	function deleteTask(index) {
-		var clonedTasks = [...tasks];
+		const options = {
+			method: 'DELETE',
+			headers: {
+				'Content-Type': 'application/json'
+			}
+		}
+		fetch(`http://localhost:8000/api/task/${tmpdata.id}`, options)
+			.then(response => response.json())
+			.then(data => {
+				console.log(data)
+				loadTasks()
+			})
+			.catch(error => console.error(error));
+		// var clonedTasks = [...tasks];
 
-		clonedTasks.splice(index, 1);
+		// clonedTasks.splice(index, 1);
 
-		setTasks(clonedTasks);
+		// setTasks(clonedTasks);
 
-		saveTasks([...clonedTasks]);
+		// saveTasks([...clonedTasks]);
 	}
 
 	function loadTasks() {
@@ -115,16 +118,30 @@ export default function App() {
 			{
 				title: current_data.title,
 				summary: current_data.summary,
-				index: index
+				id: current_data.id
 			})
 		setUpdate(true)
 		setOpened(true)
 	}
 	function doUpdate() {
-		tasks[tmpdata.index].summary = taskSummary.current.value
-		tasks[tmpdata.index].title = taskTitle.current.value
-		setTasks(tasks)
-		saveTasks([...tasks])
+		const body = {
+			title: taskTitle.current.value,
+			summary: taskSummary.current.value
+		}
+		const options = {
+			method: 'PUT',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify(body)
+		}
+		fetch(`http://localhost:8000/api/task/${tmpdata.id}`, options)
+			.then(response => response.json())
+			.then(data => {
+				console.log(data)
+				loadTasks()
+			})
+			.catch(error => console.error(error));
 	}
 
 	function checkTask(index) {
