@@ -87,13 +87,6 @@ export default function App() {
 				loadTasks()
 			})
 			.catch(error => console.error(error));
-		// var clonedTasks = [...tasks];
-
-		// clonedTasks.splice(index, 1);
-
-		// setTasks(clonedTasks);
-
-		// saveTasks([...clonedTasks]);
 	}
 
 	function loadTasks() {
@@ -146,9 +139,29 @@ export default function App() {
 
 	function checkTask(index) {
 		const clonedTasks = [...tasks]
-		clonedTasks[index].done = true
-		setTasks(clonedTasks)
-		saveTasks([...clonedTasks])
+		const body = {
+			title: clonedTasks[index].title,
+			summary: clonedTasks[index].summary,
+			status: true
+		}
+		const options = {
+			method: 'PUT',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify(body)
+		}
+		const id = clonedTasks[index].id
+		fetch(`http://localhost:8000/api/task/${id}`, options)
+			.then(response => response.json())
+			.then(data => {
+				console.log(data)
+				loadTasks()
+			})
+			.catch(error => console.error(error));
+		// clonedTasks[index].done = true
+		// setTasks(clonedTasks)
+		// saveTasks([...clonedTasks])
 	}
 	function handleOnDragEnd(params) {
 		if (!params.destination) return
@@ -270,6 +283,7 @@ export default function App() {
 																	<Card withBorder key={index} mt={'sm'} ref={provided.innerRef} {...provided.draggableProps}{...provided.dragHandleProps}>
 																		<Group position={'apart'}>
 																			<ActionIcon
+																				style={{ display: task.status ? 'none' : 'block' }}
 																				onClick={() => {
 																					checkTask(index);
 																				}}
@@ -277,7 +291,7 @@ export default function App() {
 																				variant={'transparent'}>
 																				<Check />
 																			</ActionIcon>
-																			<Text weight={'bold'} style={{ textDecoration: task.done ? "line-through" : "" }}>{task.title}</Text>
+																			<Text weight={'bold'} style={{ textDecoration: task.status ? "line-through" : "" }}>{task.title}</Text>
 																			<ActionIcon
 																				onClick={() => {
 																					deleteTask(index);
@@ -290,7 +304,7 @@ export default function App() {
 																		</Group>
 																		<Group position={'apart'}>
 
-																			<Text color={'dimmed'} size={'md'} mt={'sm'} style={{ textDecoration: task.done ? "line-through" : "" }}>
+																			<Text color={'dimmed'} size={'md'} mt={'sm'} style={{ textDecoration: task.status ? "line-through" : "" }}>
 																				{task.summary
 																					? task.summary
 																					: 'No summary was provided for this task'}
