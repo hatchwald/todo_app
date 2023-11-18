@@ -94,13 +94,15 @@ export default function App() {
 	}
 
 	function loadTasks() {
-		let loadedTasks = localStorage.getItem('tasks');
+		fetch('http://localhost:8000/api/task').then(response => {
+			if (response.ok) {
+				return response.json()
+			}
+			throw response
+		}).then(data => {
+			setTasks(data.data)
+		}).catch(error => console.error(error))
 
-		let tasks = JSON.parse(loadedTasks);
-
-		if (tasks) {
-			setTasks(tasks);
-		}
 	}
 
 	function saveTasks(tasks) {
